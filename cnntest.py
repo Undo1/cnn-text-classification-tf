@@ -56,7 +56,7 @@ def test_paths(x_raw):
         dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
 
         # Tensors we want to evaluate
-        predictions = tf.nn.softmax(graph.get_operation_by_name("output/scores").outputs[0])
+        predictions = graph.get_operation_by_name("output/scores").outputs[0]
 
         # Generate batches for one epoch
         batches = data_helpers.batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
@@ -65,7 +65,6 @@ def test_paths(x_raw):
         all_predictions = []
 
         for x_test_batch in batches:
-            print(datetime.datetime.now())
-            result = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
-            print(datetime.datetime.now())
-            return result
+            raw_result = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
+            scores = sess.run(tf.nn.softmax(raw_result))
+            return (raw_result, scores)
